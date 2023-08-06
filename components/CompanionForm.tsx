@@ -10,6 +10,11 @@ import { Input } from "./ui/input";
 import ImageUpload from "./ImageUpload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
+import { Wand2 } from "lucide-react";
+import axios from 'axios';
+import { useToast } from "./ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface CompanionFormProps {
     initalData: Companion | null;
@@ -37,6 +42,7 @@ const CompanionForm = ({
     initalData
 }: CompanionFormProps) => {
 
+    const router = useRouter();
     const form = useForm<FormRequest>({
         resolver: zodResolver(FormValidator),
         defaultValues: initalData || {
@@ -50,10 +56,31 @@ const CompanionForm = ({
     });
 
     const isLoading = form.formState.isSubmitting;
+    const { toast } = useToast();
 
-    const onSubmit = async (data: FormRequest) => {
-        console.log(data);
+    const onSubmit = async (values: FormRequest) => {
+        try {
+            if (initalData) {
+                // update companion
+                await axios.patch(`/api/companion/${initalData.id}`, values);
+            } else {
+                // create companion
+                await axios.post('/api/companion', values);
+            }
+            toast({
+                description: 'Success!'
+            });
+            router.refresh();
+            router.push('/');
+        } catch (e) {
+            toast({
+                description: 'Something went wrong',
+                variant: 'destructive'
+            })
+        }
     }
+
+
     return (
         <div className="h-full max-w-3xl p-4 mx-auto space-y-2">
             <Form {...form}>
@@ -115,6 +142,7 @@ const CompanionForm = ({
                                     <FormDescription>
                                         Short description for your AI Companion
                                     </FormDescription>
+                                    <FormMessage />
                                 </FormItem>
                             )} />
                         <FormField
@@ -149,6 +177,7 @@ const CompanionForm = ({
                                     <FormDescription>
                                         Select a category for your AI
                                     </FormDescription>
+                                    <FormMessage />
                                 </FormItem>
                             )} />
                     </div>
@@ -174,11 +203,40 @@ const CompanionForm = ({
                                         {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    Describe in detail your Companions&apos;s backstory and relevant details
+                                    Describe in detail your Companion&apos;s backstory and relevant details
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )} />
+                    <FormField
+                        name='seed'
+                        control={form.control}
+                        render={({ field }) => (
+                            <FormItem className="col-span-2 md:col-span-1">
+                                <FormLabel>Example Conversation</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        className="resize-none bg-background"
+                                        rows={7}
+                                        disabled={isLoading}
+                                        placeholder={SEED_CHAT}
+                                        {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    Provide an example conversation
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                    <div className="flex justify-center w-full">
+                        <Button
+                            size='lg'
+                            disabled={isLoading}
+                        >
+                            {initalData ? 'Edit your companion' : 'Create your companion'}
+                            <Wand2 className="w-4 h-4 ml-2" />
+                        </Button>
+                    </div>
                 </form>
             </Form>
         </div>
