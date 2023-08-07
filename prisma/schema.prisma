@@ -16,18 +16,39 @@ model Category {
 }
 
 model Companion {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   userId       String
   userName     String
   src          String
-  name         String   @db.Text
+  name         String    @db.Text
   description  String
-  instructions String   @db.Text
-  seed         String   @db.Text
-  createdAt    DateTime @default(now())
-  updatedAT    DateTime @updatedAt
+  instructions String    @db.Text
+  seed         String    @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAT    DateTime  @updatedAt
   categoryId   String
-  category     Category @relation(fields: [categoryId], references: [id])
+  category     Category  @relation(fields: [categoryId], references: [id])
+  messages     Message[]
 
   @@index([categoryId])
+  @@fulltext([name])
+}
+
+enum Role {
+  user
+  system
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  role      Role
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companionId String
+  userId      String
+  companion   Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+
+  @@index([companionId])
 }
