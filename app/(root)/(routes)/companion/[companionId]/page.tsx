@@ -1,6 +1,6 @@
 import CompanionForm from '@/components/CompanionForm';
 import { db } from '@/lib/db';
-import { FC } from 'react'
+import { auth, redirectToSignIn } from '@clerk/nextjs';
 
 interface pageProps {
     params: {
@@ -14,10 +14,17 @@ const page = async ({
     }
 }: pageProps) => {
 
+    const { userId } = auth();
+
     // TODO: check for subscription
+
+    if (!userId) {
+        return redirectToSignIn();
+    }
 
     const companion = await db.companion.findUnique({
         where: {
+            userId,
             id: companionId
         }
     });
