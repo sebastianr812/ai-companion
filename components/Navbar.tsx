@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '@/lib/utils'
 import { UserButton } from '@clerk/nextjs'
 import { Menu, Sparkles } from 'lucide-react'
@@ -7,12 +9,20 @@ import { FC } from 'react'
 import { Button } from './ui/button'
 import { ThemeToggle } from './theme-toggle'
 import MobileSidebar from './MobileSidebar'
+import useProModal from '@/hooks/use-pro-modal'
 
 const poppins = Poppins({
     weight: '600',
     subsets: ['latin']
-})
-const Navbar = () => {
+});
+
+interface NavbarProps {
+    isPro: boolean;
+}
+const Navbar = ({ isPro }: NavbarProps) => {
+
+    const proModal = useProModal();
+
     return (
         <div className='fixed z-50 flex items-center justify-between w-full h-16 px-4 py-2 border-b border-primary/10 bg-secondary'>
             <div className='flex items-center'>
@@ -24,12 +34,15 @@ const Navbar = () => {
                 </Link>
             </div>
             <div className='flex items-center gap-x-3'>
-                <Button
-                    variant='premium'
-                    size='sm'>
-                    Upgrade
-                    <Sparkles className='w-4 h-4 ml-2 text-white fill-white' />
-                </Button>
+                {!isPro ? (
+                    <Button
+                        onClick={proModal.onOpen}
+                        variant='premium'
+                        size='sm'>
+                        Upgrade
+                        <Sparkles className='w-4 h-4 ml-2 text-white fill-white' />
+                    </Button>
+                ) : null}
                 <ThemeToggle />
                 <UserButton afterSignOutUrl='/' />
             </div>

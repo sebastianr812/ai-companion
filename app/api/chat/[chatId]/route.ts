@@ -29,7 +29,6 @@ export async function POST(
         const companion = await db.companion.update({
             where: {
                 id: params.chatId,
-                userId: user.id,
             },
             data: {
                 messages: {
@@ -101,8 +100,37 @@ export async function POST(
                 .catch(console.error)
         );
 
+        const cleaned = resp.replaceAll(',', '');
+        const chunks = cleaned.split('\n');
+        const response = chunks[0];
 
+        await memoryManager.writeToHistory('' + response.trim(), companionKey);
 
+        var Readable = require('stream').Readable;
+        let s = new Readable();
+        s.push(response);
+        s.push(null);
+
+        if (response !== undefined && response.length > 1) {
+            memoryManager.writeToHistory('' + response.trim(), companionKey);
+
+            await db.companion.update({
+                where: {
+                    id: params.chatId,
+                },
+                data: {
+                    messages: {
+                        create: {
+                            content: response.trim(),
+                            role: 'system',
+                            userId: user.id
+                        }
+                    }
+                }
+            });
+        }
+
+        return new StreamingTextResponse(s);
 
     } catch (e) {
         return new NextResponse('inernal error POST:CHAT/chatId', { status: 500 });

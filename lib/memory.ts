@@ -66,7 +66,7 @@ export class MemoryManager {
     }
 
     public async writeToHistory(text: string, companionKey: CompanionKey) {
-        if (!companionKey || typeof companionKey.userId !== 'undefined') {
+        if (!companionKey || typeof companionKey.userId == 'undefined') {
             console.log('companion key set incorectly');
             return '';
         }
@@ -80,7 +80,7 @@ export class MemoryManager {
     }
 
     public async readLatestHistory(companionKey: CompanionKey): Promise<string> {
-        if (!companionKey || typeof companionKey.userId === 'undefined') {
+        if (!companionKey || typeof companionKey.userId == 'undefined') {
             console.log('companion key set inccrectly');
             return '';
         }

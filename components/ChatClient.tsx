@@ -32,7 +32,7 @@ const ChatClient: FC<ChatClientProps> = ({
         handleSubmit,
         setInput
     } = useCompletion({
-        api: `/api/chat${companion.id}`,
+        api: `/api/chat/${companion.id}`,
         onFinish(prompt, completion) {
             const systemMessage: ChatMessageProps = {
                 role: 'system',

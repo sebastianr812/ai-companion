@@ -46,7 +46,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({
                     role={message.role}
                     content={message.content}
                     key={message.content}
-                    src={message.src} />
+                    src={companion.src} />
             ))}
             {isLoading && (
                 <ChatMessage

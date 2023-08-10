@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { checkSubscription } from '@/lib/subscription';
 import { FormValidator } from '@/lib/validators/form';
 import { auth, currentUser } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
@@ -29,7 +30,11 @@ export async function PATCH(
             return new NextResponse('unauthorized', { status: 401 });
         }
 
-        // check for subscription
+        const isPro = await checkSubscription();
+
+        if (!isPro) {
+            return new NextResponse('must has subscription', { status: 403 });
+        }
 
         const companion = await db.companion.update({
             where: {
