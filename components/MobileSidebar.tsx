@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import Sidebar from "./Sidebar";
 
 interface MobileSidebarProps {
-    isPro: boolean;
+    isPro: boolean
 }
 
 const MobileSidebar = ({ isPro }: MobileSidebarProps) => {
